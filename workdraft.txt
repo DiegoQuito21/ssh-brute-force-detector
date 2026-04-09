@@ -1,0 +1,13 @@
+create a blacklist.txt
+retrieve data from both blacklist.txt and whitelist.txt 
+filter thru each with a for loop 
+Is this IP on the whitelist? 
+    → YES: ignore it completely, it's trusted
+    → NO: continue checking
+
+Is this IP on the blacklist?
+    → YES: flag it immediately, it's known bad
+    → NO: run the normal brute force detection
+WHEN the program starts:
+    read whitelist.txt and store all IPs in a list
+    read blacklist.txt and store all IPs in a list

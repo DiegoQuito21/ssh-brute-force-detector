@@ -1,7 +1,24 @@
 from datetime import datetime
 from config import THRESHOLD, TIME_WINDOW
+whitelist = open("whitelist.txt", "r").read().splitlines()
+blacklist = open("blacklist.txt", "r").read().splitlines()
 
 attempt_history = {}
+def is_whitelisted(ip):
+     if ip in whitelist:
+            return True
+     else:
+        return False
+
+
+def is_blacklisted(ip):
+     if ip in blacklist:
+        return True
+     else:
+        return False
+
+
+
 
 def record_attempt(ip, status):
     if status in ["FAILED", "INVALID"]:
@@ -22,4 +39,3 @@ def analyze_attempt(ip):
             return True
     else:
             return False
-        

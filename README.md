@@ -1,38 +1,125 @@
-# ssh-brute-force-detector
+# SSH Brute Force Detector
 
-## Overview
-Build a security tool that monitors system authentication logs for SSH brute force attack patterns, automatically detecting repeated failed login attempts and responding by adding offending IPs to firewall rules. This project teaches log file parsing, threat pattern recognition, and demonstrates automated security response capabilities used in production systems.
+A Python-based security tool that monitors SSH authentication logs in real time, 
+detects brute force attack patterns, and simulates automated firewall responses. 
+Built to demonstrate log parsing, threat detection, and automated incident response 
+concepts used in production security systems.
 
-## Step-by-Step Instructions
+---
 
-1. **Understand SSH authentication logs** on different systems—on Linux, failed SSH attempts are typically logged to `/var/log/auth.log` (Debian/Ubuntu) or `/var/log/secure` (RedHat/CentOS) with entries showing source IP, username attempted, and authentication status. Learn the log format patterns for successful logins, failed password attempts, and invalid usernames, then build log line parsers that extract relevant information (timestamp, source IP, username, result status).
+## Features
 
-2. **Implement log file monitoring and parsing** using Python to read log files and extract failed SSH login attempts, including source IP addresses and timestamps. Handle the complexity of log rotation (logs are archived and new ones created) and ensure continuous monitoring even as log files change, implementing state tracking to avoid re-reading lines already processed.
+- Real-time SSH log file monitoring
+- Pattern recognition for failed and invalid login attempts
+- Brute force detection using a configurable time window and threshold
+- IP whitelist and blacklist management
+- Simulated firewall blocking with iptables command output
+- Persistent attack logging and audit trail
+- Escalating response — detect, alert, block
 
-3. **Build brute force pattern detection** by tracking failed login attempts per source IP over time windows (e.g., 5 failed attempts in 10 minutes indicates an attack). Implement configurable thresholds for what constitutes an attack, distinguishing between user mistakes (occasional failed logins from legitimate IPs) and actual brute force (many failed attempts from unexpected sources).
+---
 
-4. **Create IP reputation tracking** by maintaining a database of known-good IPs (internal networks, remote offices, trusted partners) that should be excluded from blocking, and a list of known-bad IPs that have shown attack behavior. Implement whitelist/blacklist functionality preventing false positives where legitimate users get blocked after mistyping passwords a few times.
+## How It Works
 
-5. **Implement automatic firewall rule addition** using iptables (Linux), UFW, or similar tools to dynamically block attacking IPs. Execute firewall commands programmatically when thresholds are exceeded, adding rules that drop all packets from the attacking source or rate-limit connections. Build in safeguards preventing accidental self-blocking (blocking the admin's own IP, blocking critical IPs).
+The tool watches an SSH auth log file continuously. Every time a new line appears 
+it is parsed for relevant events. Failed and invalid login attempts are tracked per 
+IP address over a sliding time window. If an IP exceeds the configured threshold 
+it is flagged as a brute force attacker, logged, and a simulated firewall block is issued.
 
-6. **Add escalating response mechanisms** implementing multi-stage responses: first alert administrators of potential attack, then rate-limit connections from the source IP, then block the IP entirely if attacks continue. Include automatic unblocking after a configurable time period (24-48 hours) to allow IPs to be whitelisted, and implement manual unblock capabilities for legitimate IPs accidentally blocked.
+Whitelisted IPs are ignored entirely. Blacklisted IPs are flagged and blocked immediately 
+on first appearance.
 
-7. **Create alerting and logging functionality** that notifies administrators when attacks are detected through email, Slack, system logs, or dashboard alerts. Log all detected attacks, blocking actions, and false positives to a database or file for audit trails, compliance documentation, and incident investigation—include details about the attacking IP, targeted usernames, attempt frequency, and response actions taken.
+---
+## Project Structure 
+ssh-brute-force detector
+├── main.py           ← entry point
+├── monitor.py        ← real-time log file watcher
+├── log_parser.py     ← SSH log line parser
+├── detector.py       ← brute force detection engine
+├── firewall.py       ← simulated firewall response
+├── alerts.py         ← attack logging and alerts
+├── config.py         ← configurable settings
+├── whitelist.txt     ← trusted IP addresses
+├── blacklist.txt     ← known bad IP addresses
+├── logs/
+│   └── auth.log      ← sample SSH auth log
+└── data/
+├── attack_log.txt    ← persistent attack records
+└── blocked_ips.txt   ← record of blocked IPs
 
-8. **Build comprehensive documentation** explaining SSH security best practices, discussing brute force attack patterns and mitigation strategies, and providing deployment instructions with security considerations. Discuss alternative protections (key-based authentication, fail2ban integration, VPN access restrictions), explain how to configure sensitivity to avoid false positives, and provide examples of logs from actual brute force attacks for analysis and training.
+---
 
-## Key Concepts to Learn
-- Log file parsing and text analysis
-- State tracking and continuous monitoring
-- Pattern recognition for threat detection
-- Firewall integration and automation
-- Alerting and incident response
-- Whitelist/blacklist management
+## Configuration
 
-## Deliverables
-- SSH log file parser and monitor
-- Brute force pattern detection with configurable thresholds
-- Automatic firewall rule generation and management
-- IP whitelist/blacklist functionality
-- Multi-stage escalating response
-- Alert notifications and attack logging.
+Edit `config.py` to adjust detection sensitivity:
+
+```python
+THRESHOLD = 5      # number of failures before flagging as attack
+TIME_WINDOW = 600  # time window in seconds (600 = 10 minutes)
+```
+
+---
+
+## Quick Start
+
+```bash
+# Clone the repo
+git clone https://github.com/DiegoQuito21/ssh-brute-force-detector.git
+cd ssh-brute-force-detector
+
+# Set up virtual environment
+python -m venv venv
+venv\Scripts\activate  # Windows
+source venv/bin/activate  # Linux/Mac
+
+# Install dependencies
+pip install rich watchdog
+
+# Run the detector
+python main.py
+```
+
+---
+
+## Sample Output
+
+[MONITOR] Watching logs/auth.log for SSH activity...
+[FAILED] IP: 45.33.32.156 | User: root | Time: Apr  6 14:20:01
+[FAILED] IP: 45.33.32.156 | User: root | Time: Apr  6 14:20:03
+[FAILED] IP: 45.33.32.156 | User: admin | Time: Apr  6 14:20:05
+[INVALID] IP: 45.33.32.156 | User: test | Time: Apr  6 14:20:07
+[FAILED] IP: 45.33.32.156 | User: root | Time: Apr  6 14:20:09
+[ALERT] BRUTE FORCE ATTACK DETECTED from 45.33.32.156 
+[FIREWALL] Blocking 45.33.32.156
+[FIREWALL] Simulated command: iptables -A INPUT -s 45.33.32.156 -j DROP
+[BLACKLIST] Known bad IP detected: 78.12.44.91
+[FIREWALL] Blocking 78.12.44.91
+[FIREWALL] Simulated command: iptables -A INPUT -s 78.12.44.91 -j DROP
+
+---
+
+## Key Concepts Demonstrated
+
+- Log file parsing and regex pattern matching
+- Real-time file monitoring with continuous polling
+- Sliding time window threat detection
+- IP reputation management with whitelist and blacklist
+- Simulated firewall integration and automated response
+- Persistent logging and audit trails
+- Producer-consumer style architecture
+
+---
+
+## Future Improvements
+
+- Email and Slack alerting
+- Real iptables integration on Linux
+- Web dashboard for live monitoring
+- Database storage for attack records
+- Machine learning based anomaly detection
+
+---
+
+## Status
+
+Complete — built as a portfolio project demonstrating cybersecurity tooling and Python systems programming.

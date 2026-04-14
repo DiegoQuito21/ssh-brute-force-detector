@@ -20,7 +20,7 @@ def is_blacklisted(ip):
 
 
 
-def record_attempt(ip, status):
+def record_attempt(ip, status): 
     if status in ["FAILED", "INVALID"]:
         if ip not in attempt_history:
             attempt_history[ip] = []

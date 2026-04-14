@@ -1,8 +1,8 @@
 import time    
 from detector import record_attempt, analyze_attempt, is_whitelisted , is_blacklisted
 from log_parser import parse_log_line  
-
-
+from firewall import block_ip
+from alerts import log_attack 
 
 def monitor_log(log_file):
     """
@@ -19,15 +19,18 @@ def monitor_log(log_file):
             if line:
                 result = parse_log_line(line)
                 if result:
+                  
+                    if is_whitelisted(result["ip"]):
+                        continue 
                     print(f"[{result['status']}] "
                     f"IP: {result['ip']} | "
                     f"User: {result['username']} | "
                     f"Time: {result['timestamp']}")
-                    if is_whitelisted(result["ip"]):
-                        continue                        
+                                         
 
                     if is_blacklisted(result["ip"]):
                         print(f"[BLACKLIST] Known bad IP detected: {result['ip']}")
+                        block_ip(result["ip"])
                         continue                         
 
                  
@@ -35,5 +38,8 @@ def monitor_log(log_file):
                     is_attack = analyze_attempt(result["ip"])
                     if is_attack:
                         print(f"[ALERT] BRUTE FORCE ATTACK DETECTED from {result['ip']}")
+                        log_attack(result["ip"] ,  result["username"] , result["timestamp"])
+                        block_ip(result["ip"])
+
             else:
                 time.sleep(0.5)

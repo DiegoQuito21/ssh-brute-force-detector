@@ -1,13 +1,8 @@
-create a blacklist.txt
-retrieve data from both blacklist.txt and whitelist.txt 
-filter thru each with a for loop 
-Is this IP on the whitelist? 
-    → YES: ignore it completely, it's trusted
-    → NO: continue checking
-
-Is this IP on the blacklist?
-    → YES: flag it immediately, it's known bad
-    → NO: run the normal brute force detection
-WHEN the program starts:
-    read whitelist.txt and store all IPs in a list
-    read blacklist.txt and store all IPs in a list
+firewall.py receives an IP address
+check if that IP is already in blocked list
+    → YES: print "IP already blocked" and stop
+    → NO: 
+        print the iptables command we WOULD run
+        add IP to blocked list in memory
+        save it to blocked_ips.txt
+        print confirmation that IP was blocked

@@ -1,23 +1,23 @@
-Phase 1 — Setup (4/6/26) - 
+Phase 1 — Setup (4/3/26) 
 GitHub repo · project folders · virtual environment · install dependencies
 
-Phase 2 — Log parser
+Phase 2 — Log parser (4/3/26
 Read auth.log · regex patterns · extract IP, timestamp, username, result
 
-Phase 3 — Live monitor
+Phase 3 — Live monitor (4/3/26)
 Tail log file continuously · handle log rotation · track already-read lines
 
-Phase 4 — Brute force detection
+Phase 4 — Brute force detection (4/4/26)
 Track failures per IP · sliding time window · configurable thresholds
 
-Phase 5 — Whitelist / blacklist
+Phase 5 — Whitelist / blacklist (4/4/26)
 Trusted IP list · known-bad IP list · prevent false positives
 
-Phase 6 — Simulated firewall response
+Phase 6 — Simulated firewall response (4/4/26)
 Log block actions · print iptables commands · mock escalation stages
 
-Phase 7 — Alerts and logging
+Phase 7 — Alerts and logging (4/5/26)
 Console alerts · write attack log to file · audit trail with timestamps
 
-Phase 8 — Polish and push
+Phase 8 — Polish and push (4/5/26) 
 Clean up code · add comments · update README · push to GitHub

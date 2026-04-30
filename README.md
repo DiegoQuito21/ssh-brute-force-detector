@@ -110,16 +110,8 @@ python main.py
 
 ---
 
-## Future Improvements
-
-- Email and Slack alerting
-- Real iptables integration on Linux
-- Web dashboard for live monitoring
-- Database storage for attack records
-- Machine learning based anomaly detection
-
 ---
 
 ## Status
-
-Complete — built as a portfolio project demonstrating cybersecurity tooling and Python systems programming.
+Complete — built as a portfolio project demonstrating 
+cybersecurity tooling and Python systems programming skills.
